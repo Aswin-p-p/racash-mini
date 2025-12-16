@@ -6,16 +6,26 @@ export const connectAndLogin = async () => {
     alert('Please open in Opera MiniPay')
     return
   }
-  const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+
+  // 1️⃣ Connect wallet
+  const accounts = await window.ethereum.request({
+    method: 'eth_requestAccounts'
+  })
   const wallet_address = accounts[0]
 
+  // 2️⃣ Wallet auth
   const res = await api.post('/users/wallet-auth/', { wallet_address })
   const { access, refresh } = res.data.tokens
+
   localStorage.setItem('access_token', access)
   localStorage.setItem('refresh_token', refresh)
-  return res.data.user
-}
 
+  // 🔥 3️⃣ FETCH PROFILE (THIS WAS MISSING)
+  const profileRes = await api.get('/users/profile/')
+
+  // 4️⃣ Return FULL profile (wallets included)
+  return profileRes.data
+}
 export const depositCUSD = async (amount) => {
   const provider = new ethers.providers.Web3Provider(window.ethereum)
   const signer = provider.getSigner()
@@ -29,3 +39,4 @@ export const depositCUSD = async (amount) => {
   await tx.wait()
   return tx.hash
 }
+
