@@ -9,16 +9,13 @@ export default function Login() {
   const login = async () => {
     try {
       setLoading(true)
-
-      // 1️⃣ Wallet auth + profile fetch MUST finish
       await connectAndLogin()
 
-      // 2️⃣ Navigate only AFTER everything is ready
+      // 🔥 LOGIN SUCCESS → GO DASHBOARD
       nav('/dashboard')
-
     } catch (err) {
-      console.error('Login failed:', err)
-      alert('Login failed. Please try again.')
+      console.error(err)
+      alert('Wallet connection failed')
     } finally {
       setLoading(false)
     }
@@ -29,7 +26,7 @@ export default function Login() {
       <button
         onClick={login}
         disabled={loading}
-        className="bg-blue-600 text-white px-6 py-3 rounded disabled:opacity-50"
+        className="bg-blue-600 text-white px-6 py-3 rounded"
       >
         {loading ? 'Connecting...' : 'Connect Wallet to Start'}
       </button>

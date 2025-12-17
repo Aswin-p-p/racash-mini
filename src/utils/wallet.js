@@ -8,16 +8,17 @@ export const connectAndLogin = async () => {
 
   const wallet_address = accounts[0]
 
+  // LOGIN ONLY
   const res = await api.post('/users/wallet-auth/', { wallet_address })
 
   const { access, refresh } = res.data.tokens
   localStorage.setItem('access_token', access)
   localStorage.setItem('refresh_token', refresh)
 
-  // Load profile
-  const profileRes = await api.get('/users/profile/')
-  return profileRes.data
+  // 🔥 DO NOT FETCH PROFILE HERE
+  return true
 }
+
 
 export const depositCUSD = async (amount) => {
   const provider = new ethers.providers.Web3Provider(window.ethereum)
