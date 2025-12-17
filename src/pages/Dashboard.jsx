@@ -13,17 +13,14 @@ export default function Dashboard() {
         const res = await api.get('/users/profile/')
         setProfile(res.data)
       } catch (err) {
-        console.error('Profile load error:', err)
         setError('Failed to load profile')
       } finally {
         setLoading(false)
       }
     }
-
     loadProfile()
   }, [])
 
-  // 🔹 NEVER return null → causes white screen
   if (loading) {
     return <div className="p-6">Loading dashboard...</div>
   }
@@ -32,11 +29,10 @@ export default function Dashboard() {
     return <div className="p-6 text-red-600">{error}</div>
   }
 
-  if (!profile) {
-    return <div className="p-6">No profile data</div>
-  }
-
-  const wallet = profile.wallets?.[0]
+  const wallet =
+    profile.wallets && profile.wallets.length > 0
+      ? profile.wallets[0]
+      : null
 
   return (
     <div className="p-6">
@@ -44,12 +40,17 @@ export default function Dashboard() {
 
       <p>User: {profile.username}</p>
 
-      <p>
+      <p className="mt-2">
         Balance:{' '}
-        {wallet ? `${wallet.balance} USD` : 'Wallet initializing...'}
+        {wallet
+          ? `${wallet.balance} USD`
+          : 'Wallet will be created on first deposit'}
       </p>
 
-      <Link to="/deposit" className="text-blue-600 underline">
+      <Link
+        to="/deposit"
+        className="inline-block mt-4 text-blue-600 underline"
+      >
         Deposit
       </Link>
     </div>
