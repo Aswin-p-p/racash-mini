@@ -67,6 +67,29 @@ const DepositPage = () => {
     );
   }
 
+  // Show message if no deposit methods available
+  if (depositMethods.length === 0) {
+    return (
+      <div className="transaction-page">
+        <Navbar />
+        <div className="transaction-container">
+          <div className="transaction-header fade-in">
+            <div className="header-icon deposit">
+              <ArrowDownCircle size={32} />
+            </div>
+            <h1>Deposit Funds</h1>
+            <p className="text-muted">Add money to your R-Cash wallet</p>
+          </div>
+          <div className="transaction-form-card glass-card fade-in">
+            <div className="alert alert-error">
+              No deposit methods available. Please contact support or add deposit methods in the admin panel.
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="transaction-page">
       <Navbar />
