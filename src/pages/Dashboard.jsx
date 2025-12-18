@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { Wallet, ArrowUpCircle, ArrowDownCircle, Shield, CheckCircle, Clock } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
+import { formatWalletAddress } from '../utils/minipay';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -34,6 +35,11 @@ const Dashboard = () => {
   }
 
   const wallets = user?.wallets || [];
+  
+  // Format username if it's a wallet address
+  const displayName = user?.username?.startsWith('0x') 
+    ? formatWalletAddress(user.username)
+    : user?.username;
 
   return (
     <div className="dashboard-page">
@@ -42,11 +48,10 @@ const Dashboard = () => {
       <div className="dashboard-container">
         <div className="dashboard-header fade-in">
           <div>
-            <h1>Welcome back, {user?.username}!</h1>
+            <h1>Welcome back, {displayName}!</h1>
             <p className="text-muted">Manage your finances with R-Cash</p>
           </div>
-          <div className="kyc-status">
-            {user?.is_kyc_verified ? (
+          <div className="kyc-status">{user?.is_kyc_verified ? (
               <div className="badge badge-success">
                 <CheckCircle size={16} />
                 KYC Verified
