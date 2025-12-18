@@ -1,0 +1,141 @@
+.minipay-landing {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+.minipay-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--gradient-primary);
+    opacity: 0.15;
+    z-index: 0;
+}
+
+.minipay-background::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
+    animation: rotate 15s linear infinite;
+}
+
+.minipay-card {
+    max-width: 480px;
+    width: 100%;
+    padding: var(--spacing-2xl);
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.minipay-icon {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto var(--spacing-xl);
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: var(--shadow-glow);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: var(--shadow-glow);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+    }
+}
+
+.error-icon {
+    font-size: 4rem;
+}
+
+.minipay-card h1 {
+    margin-bottom: var(--spacing-sm);
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 2.5rem;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-2xl);
+    font-size: 1.125rem;
+}
+
+.status-container {
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.spinner-large {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(99, 102, 241, 0.2);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.status-message {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.status-message.error {
+    color: var(--error);
+}
+
+.retry-btn {
+    margin-top: var(--spacing-md);
+}
+
+.minipay-footer {
+    margin-top: var(--spacing-2xl);
+    padding-top: var(--spacing-xl);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 640px) {
+    .minipay-card {
+        padding: var(--spacing-xl);
+    }
+
+    .minipay-card h1 {
+        font-size: 2rem;
+    }
+
+    .minipay-icon {
+        width: 96px;
+        height: 96px;
+    }
+}

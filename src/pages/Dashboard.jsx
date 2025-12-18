@@ -1,58 +1,148 @@
-import { useEffect, useState } from 'react'
-import api from '../api/axios'
-import { Link } from 'react-router-dom'
+import React from 'react';
+import { useEffect, useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { Link } from 'react-router-dom';
+import Navbar from '../components/Navbar';
+import { Wallet, ArrowUpCircle, ArrowDownCircle, Shield, CheckCircle, Clock } from 'lucide-react';
+import { formatCurrency } from '../utils/formatters';
+import './Dashboard.css';
 
-export default function Dashboard() {
-  const [profile, setProfile] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+const Dashboard = () => {
+  const { user, refreshUser } = useAuth();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadProfile = async () => {
+    const loadData = async () => {
       try {
-        const res = await api.get('/users/profile/')
-        setProfile(res.data)
-      } catch (err) {
-        setError('Failed to load profile')
+        await refreshUser();
+      } catch (error) {
+        console.error('Failed to load user data:', error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    loadProfile()
-  }, [])
+    };
+    loadData();
+  }, []);
 
   if (loading) {
-    return <div className="p-6">Loading dashboard...</div>
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Loading dashboard...</p>
+      </div>
+    );
   }
 
-  if (error) {
-    return <div className="p-6 text-red-600">{error}</div>
-  }
-
-  const wallet =
-    profile.wallets && profile.wallets.length > 0
-      ? profile.wallets[0]
-      : null
+  const wallets = user?.wallets || [];
 
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold mb-4">Dashboard</h1>
+    <div className="dashboard-page">
+      <Navbar />
+      
+      <div className="dashboard-container">
+        <div className="dashboard-header fade-in">
+          <div>
+            <h1>Welcome back, {user?.username}!</h1>
+            <p className="text-muted">Manage your finances with R-Cash</p>
+          </div>
+          <div className="kyc-status">
+            {user?.is_kyc_verified ? (
+              <div className="badge badge-success">
+                <CheckCircle size={16} />
+                KYC Verified
+              </div>
+            ) : (
+              <div className="badge badge-warning">
+                <Clock size={16} />
+                KYC Pending
+              </div>
+            )}
+          </div>
+        </div>
 
-      <p>User: {profile.username}</p>
+        <div className="quick-actions fade-in">
+          <Link to="/deposit" className="action-card">
+            <div className="action-icon deposit">
+              <ArrowDownCircle size={24} />
+            </div>
+            <h3>Deposit</h3>
+            <p>Add funds to your wallet</p>
+          </Link>
 
-      <p className="mt-2">
-        Balance:{' '}
-        {wallet
-          ? `${wallet.balance} USD`
-          : 'Wallet will be created on first deposit'}
-      </p>
+          <Link to="/withdraw" className="action-card">
+            <div className="action-icon withdraw">
+              <ArrowUpCircle size={24} />
+            </div>
+            <h3>Withdraw</h3>
+            <p>Send money to your account</p>
+          </Link>
 
-      <Link
-        to="/deposit"
-        className="inline-block mt-4 text-blue-600 underline"
-      >
-        Deposit
-      </Link>
+          <Link to="/kyc" className="action-card">
+            <div className="action-icon kyc">
+              <Shield size={24} />
+            </div>
+            <h3>KYC</h3>
+            <p>Verify your identity</p>
+          </Link>
+        </div>
+
+        <div className="wallets-section">
+          <h2>Your Wallets</h2>
+          <div className="wallets-grid fade-in">
+            {wallets.length > 0 ? (
+              wallets.map((wallet) => (
+                <div key={wallet.id} className="wallet-card glass-card">
+                  <div className="wallet-header">
+                    <div className="wallet-icon">
+                      <Wallet size={24} />
+                    </div>
+                    <span className="wallet-currency">{wallet.currency}</span>
+                  </div>
+                  <div className="wallet-balance">
+                    {formatCurrency(wallet.balance, wallet.currency)}
+                  </div>
+                  <div className="wallet-footer">
+                    <span className="text-muted">Available Balance</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="empty-state">
+                <Wallet size={48} />
+                <p>No wallets found</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="info-section">
+          <div className="info-card glass-card">
+            <h3>Account Information</h3>
+            <div className="info-grid">
+              <div className="info-item">
+                <span className="info-label">Email</span>
+                <span className="info-value">{user?.email}</span>
+              </div>
+              <div className="info-item">
+                <span className="info-label">Phone</span>
+                <span className="info-value">{user?.phone_number}</span>
+              </div>
+              <div className="info-item">
+                <span className="info-label">Country</span>
+                <span className="info-value">{user?.country}</span>
+              </div>
+              <div className="info-item">
+                <span className="info-label">Member Since</span>
+                <span className="info-value">
+                  {new Date(user?.date_joined).toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};
+
+export default Dashboard;

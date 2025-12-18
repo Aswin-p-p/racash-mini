@@ -1,0 +1,93 @@
+.kyc-page {
+    min-height: 100vh;
+    background: var(--bg-primary);
+}
+
+.kyc-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--spacing-2xl) var(--spacing-lg);
+}
+
+.kyc-header {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+}
+
+.kyc-header h1 {
+    margin-bottom: var(--spacing-sm);
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.kyc-status-card,
+.kyc-form-card {
+    padding: var(--spacing-2xl);
+    text-align: center;
+}
+
+.status-icon {
+    margin-bottom: var(--spacing-lg);
+}
+
+.status-message {
+    margin-top: var(--spacing-lg);
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.kyc-form {
+    margin-top: var(--spacing-xl);
+}
+
+.upload-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-2xl);
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.upload-label:hover {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.upload-label span {
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.preview {
+    margin-top: var(--spacing-md);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.preview img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+@media (max-width: 640px) {
+
+    .kyc-status-card,
+    .kyc-form-card {
+        padding: var(--spacing-lg);
+    }
+}
