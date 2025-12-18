@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Home, FileText, ArrowUpCircle, ArrowDownCircle, Shield, LogOut, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import { formatWalletAddress } from '../utils/minipay';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -14,6 +15,11 @@ const Navbar = () => {
     await logout();
     navigate('/login');
   };
+
+  // Format username if it's a wallet address
+  const displayName = user?.username?.startsWith('0x') 
+    ? formatWalletAddress(user.username)
+    : user?.username;
 
   return (
     <nav className="navbar">
@@ -52,7 +58,7 @@ const Navbar = () => {
               {user?.username?.charAt(0).toUpperCase()}
             </div>
             <div className="user-info">
-              <span className="user-name">{user?.username}</span>
+              <span className="user-name">{displayName}</span>
               {user?.is_kyc_verified && (
                 <span className="badge badge-success">Verified</span>
               )}
