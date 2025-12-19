@@ -86,8 +86,8 @@ export const kycAPI = {
 export const transactionAPI = {
   getPayoutPartners: () => api.get('/payout-partners/'),
   getDepositMethods: () => api.get('/deposit-methods/'),
-  initiateDeposit: (data) => api.post('/deposit/', data),
-  initiateWithdrawal: (data) => api.post('/withdraw/', data),
+  initiateDeposit: (data) => api.post('/deposit/initiate/', data),
+  initiateWithdrawal: (data) => api.post('/withdraw/initiate/', data),
   getTransactions: (params) => api.get('/transactions/', { params }),
   getTransactionDetail: (id) => api.get(`/transactions/${id}/`),
 };
