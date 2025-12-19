@@ -62,7 +62,7 @@ const WithdrawPage = () => {
       const response = await transactionAPI.initiateWithdrawal({
         amount: formData.amount,
         currency: formData.currency,
-        payout_partner: formData.payout_partner,
+        partner_id: formData.payout_partner,
         phone_number: formData.phone_number,
       });
 

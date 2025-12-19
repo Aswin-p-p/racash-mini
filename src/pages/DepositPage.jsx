@@ -47,7 +47,7 @@ const DepositPage = () => {
       const response = await transactionAPI.initiateDeposit({
         amount: formData.amount,
         currency: formData.currency,
-        deposit_method: formData.method_id,
+        method_id: formData.method_id,
       });
 
       setRedirectUrl(response.data.redirect_url);
