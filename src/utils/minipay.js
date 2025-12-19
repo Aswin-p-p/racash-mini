@@ -93,6 +93,9 @@ export const getMiniPayBalance = async (address) => {
     const data = "0x70a08231" + "000000000000000000000000" + cleanAddress;
 
     const fetchBalance = async (rpcUrl, contractAddress) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
         try {
             const response = await fetch(rpcUrl, {
                 method: 'POST',
@@ -105,8 +108,10 @@ export const getMiniPayBalance = async (address) => {
                         data: data
                     }, "latest"],
                     id: 1
-                })
+                }),
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
             const result = await response.json();
             if (result.error) return 0;
             return Number(BigInt(result.result)) / 1e18;
@@ -118,6 +123,9 @@ export const getMiniPayBalance = async (address) => {
 
     // Helper for Native Balance (eth_getBalance)
     const fetchNativeBalance = async (rpcUrl) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
         try {
             const response = await fetch(rpcUrl, {
                 method: 'POST',
@@ -127,8 +135,10 @@ export const getMiniPayBalance = async (address) => {
                     method: "eth_getBalance",
                     params: [address, "latest"],
                     id: 1
-                })
+                }),
+                signal: controller.signal
             });
+            clearTimeout(timeoutId);
             const result = await response.json();
             if (result.error) return 0;
             return Number(BigInt(result.result)) / 1e18;
