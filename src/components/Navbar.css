@@ -165,14 +165,28 @@
     .user-info {
         display: none;
     }
+    
+    .navbar-actions {
+        gap: 0.5rem;
+    }
+    
+    .user-menu {
+        padding: 0.25rem;
+        background: transparent;
+        border: none;
+    }
+
+    .btn-logout {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+    }
 }
 
 @media (max-width: 640px) {
     .navbar-brand span {
         display: none;
-    }
-
-    .user-menu {
-        padding: 0.5rem;
     }
 }
