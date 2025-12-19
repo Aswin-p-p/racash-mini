@@ -28,9 +28,10 @@ const WithdrawPage = () => {
   const loadPayoutPartners = async () => {
     try {
       const response = await transactionAPI.getPayoutPartners();
-      setPayoutPartners(response.data);
-      if (response.data.length > 0) {
-        setFormData(prev => ({ ...prev, payout_partner: response.data[0].id }));
+      const data = Array.isArray(response.data) ? response.data : [];
+      setPayoutPartners(data);
+      if (data.length > 0) {
+        setFormData(prev => ({ ...prev, payout_partner: data[0].id }));
       }
     } catch (err) {
       console.error('Failed to load payout partners:', err);

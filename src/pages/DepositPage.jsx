@@ -26,9 +26,10 @@ const DepositPage = () => {
   const loadDepositMethods = async () => {
     try {
       const response = await transactionAPI.getDepositMethods();
-      setDepositMethods(response.data);
-      if (response.data.length > 0) {
-        setFormData(prev => ({ ...prev, method_id: response.data[0].id }));
+      const data = Array.isArray(response.data) ? response.data : [];
+      setDepositMethods(data);
+      if (data.length > 0) {
+        setFormData(prev => ({ ...prev, method_id: data[0].id }));
       }
     } catch (err) {
       console.error('Failed to load deposit methods:', err);

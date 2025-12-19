@@ -28,7 +28,8 @@ const TransactionsPage = () => {
       if (filters.currency) params.currency = filters.currency;
 
       const response = await transactionAPI.getTransactions(params);
-      setTransactions(response.data);
+      const data = Array.isArray(response.data) ? response.data : [];
+      setTransactions(data);
     } catch (err) {
       console.error('Failed to load transactions:', err);
     } finally {
