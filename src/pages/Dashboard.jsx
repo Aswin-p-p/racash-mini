@@ -5,17 +5,24 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { Wallet, ArrowUpCircle, ArrowDownCircle, Shield, CheckCircle, Clock } from 'lucide-react';
 import { formatCurrency } from '../utils/formatters';
-import { formatWalletAddress } from '../utils/minipay';
+import { formatWalletAddress, getMiniPayBalance } from '../utils/minipay';
 import './Dashboard.css';
 
 const Dashboard = () => {
   const { user, refreshUser } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [miniPayBalance, setMiniPayBalance] = useState(null);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         await refreshUser();
+        // Fetch MiniPay balance if user has a wallet address
+        if (user?.wallet_address || user?.username?.startsWith('0x')) {
+            const address = user?.wallet_address || user?.username;
+            const bal = await getMiniPayBalance(address);
+            setMiniPayBalance(bal);
+        }
       } catch (error) {
         console.error('Failed to load user data:', error);
       } finally {
@@ -94,6 +101,24 @@ const Dashboard = () => {
         <div className="wallets-section">
           <h2>Your Wallets</h2>
           <div className="wallets-grid fade-in">
+            {/* MiniPay Wallet Card */}
+            {miniPayBalance && (
+                <div className="wallet-card minipay-card">
+                  <div className="wallet-header">
+                    <div className="wallet-icon">
+                      <Wallet size={24} />
+                    </div>
+                    <span className="wallet-currency">MiniPay (cUSD)</span>
+                  </div>
+                  <div className="wallet-balance">
+                    {formatCurrency(miniPayBalance, 'USD')}
+                  </div>
+                  <div className="wallet-footer">
+                    <span className="text-muted">In Your Pocket</span>
+                  </div>
+                </div>
+            )}
+
             {wallets.length > 0 ? (
               wallets.map((wallet) => (
                 <div key={wallet.id} className="wallet-card glass-card">
@@ -112,10 +137,12 @@ const Dashboard = () => {
                 </div>
               ))
             ) : (
-              <div className="empty-state">
-                <Wallet size={48} />
-                <p>No wallets found</p>
-              </div>
+              !miniPayBalance && (
+                  <div className="empty-state">
+                    <Wallet size={48} />
+                    <p>No wallets found</p>
+                  </div>
+              )
             )}
           </div>
         </div>

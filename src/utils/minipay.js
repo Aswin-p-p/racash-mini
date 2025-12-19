@@ -80,3 +80,36 @@ export const formatWalletAddress = (address) => {
     if (!address) return '';
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
 };
+
+/**
+ * Get cUSD Balance from Blockchain
+ */
+export const getMiniPayBalance = async (address) => {
+    if (!window.ethereum || !address) return '0.00';
+
+    // cUSD Contract Address (Celo Mainnet)
+    const CUSD_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a";
+
+    // ERC20 balanceOf signature hash: 70a08231
+    // Padding address to 32 bytes
+    const data = "0x70a08231" + "000000000000000000000000" + address.replace("0x", "");
+
+    try {
+        const balanceHex = await window.ethereum.request({
+            method: "eth_call",
+            params: [{
+                to: CUSD_ADDRESS,
+                data: data
+            }, "latest"]
+        });
+
+        // Convert hex to decimal (18 decimals for cUSD)
+        const balanceWei = BigInt(balanceHex);
+        const balance = Number(balanceWei) / 1e18;
+
+        return balance.toFixed(2);
+    } catch (error) {
+        console.error("Error fetching MiniPay balance:", error);
+        return '0.00';
+    }
+};
