@@ -83,65 +83,46 @@ export const formatWalletAddress = (address) => {
 
 /**
  * Get cUSD Balance from Blockchain
+ * Checks both Mainnet and Alfajores Testnet
  */
 export const getMiniPayBalance = async (address) => {
     if (!address) return '0.00';
 
-    // cUSD Contract Address (Celo Mainnet)
-    const CUSD_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a";
+    const cleanAddress = address.replace("0x", "");
+    // ERC20 balanceOf signature hash: 70a08231 + padding (24 zeros)
+    const data = "0x70a08231" + "000000000000000000000000" + cleanAddress;
 
-    // cUSD Contract Address (Alfajores Testnet - for testing)
-    const CUSD_ALFAJORES = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1";
-
-    // ERC20 balanceOf signature hash: 70a08231 + padding
-    const data = "0x70a08231" + "000000000000000000000000" + address.replace("0x", "");
-
-    try {
-        let balanceHex = null;
-
-        // 1. Try window.ethereum first
-        if (window.ethereum) {
-            try {
-                balanceHex = await window.ethereum.request({
-                    method: "eth_call",
-                    params: [{
-                        to: CUSD_ADDRESS,
-                        data: data
-                    }, "latest"]
-                });
-            } catch (e) {
-                console.warn("window.ethereum fetch failed, trying fallback...", e);
-            }
-        }
-
-        // 2. Fallback to Public RPC (Mainnet) if step 1 failed
-        if (!balanceHex || balanceHex === '0x') {
-            const response = await fetch('https://forno.celo.org', {
+    const fetchBalance = async (rpcUrl, contractAddress) => {
+        try {
+            const response = await fetch(rpcUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     jsonrpc: "2.0",
                     method: "eth_call",
                     params: [{
-                        to: CUSD_ADDRESS,
+                        to: contractAddress,
                         data: data
                     }, "latest"],
                     id: 1
                 })
             });
             const result = await response.json();
-            balanceHex = result.result;
+            if (result.error) return 0;
+            return Number(BigInt(result.result)) / 1e18;
+        } catch (e) {
+            console.error("RPC Fetch Error:", e);
+            return 0;
         }
+    };
 
-        if (!balanceHex || balanceHex === '0x') return '0.00';
+    // 1. Check Celo Mainnet
+    const mainnetBal = await fetchBalance('https://forno.celo.org', "0x765DE816845861e75A25fCA122bb6898B8B1282a");
+    if (mainnetBal > 0) return mainnetBal.toFixed(2);
 
-        // Convert hex to decimal (18 decimals for cUSD)
-        const balanceWei = BigInt(balanceHex);
-        const balance = Number(balanceWei) / 1e18;
+    // 2. Check Alfajores Testnet
+    const testnetBal = await fetchBalance('https://alfajores-forno.celo-testnet.org', "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1");
+    if (testnetBal > 0) return testnetBal.toFixed(2);
 
-        return balance.toFixed(2);
-    } catch (error) {
-        console.error("Error fetching MiniPay balance:", error);
-        return '0.00';
-    }
+    return '0.00';
 };
