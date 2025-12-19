@@ -85,23 +85,55 @@ export const formatWalletAddress = (address) => {
  * Get cUSD Balance from Blockchain
  */
 export const getMiniPayBalance = async (address) => {
-    if (!window.ethereum || !address) return '0.00';
+    if (!address) return '0.00';
 
     // cUSD Contract Address (Celo Mainnet)
     const CUSD_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a";
 
-    // ERC20 balanceOf signature hash: 70a08231
-    // Padding address to 32 bytes
+    // cUSD Contract Address (Alfajores Testnet - for testing)
+    const CUSD_ALFAJORES = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1";
+
+    // ERC20 balanceOf signature hash: 70a08231 + padding
     const data = "0x70a08231" + "000000000000000000000000" + address.replace("0x", "");
 
     try {
-        const balanceHex = await window.ethereum.request({
-            method: "eth_call",
-            params: [{
-                to: CUSD_ADDRESS,
-                data: data
-            }, "latest"]
-        });
+        let balanceHex = null;
+
+        // 1. Try window.ethereum first
+        if (window.ethereum) {
+            try {
+                balanceHex = await window.ethereum.request({
+                    method: "eth_call",
+                    params: [{
+                        to: CUSD_ADDRESS,
+                        data: data
+                    }, "latest"]
+                });
+            } catch (e) {
+                console.warn("window.ethereum fetch failed, trying fallback...", e);
+            }
+        }
+
+        // 2. Fallback to Public RPC (Mainnet) if step 1 failed
+        if (!balanceHex || balanceHex === '0x') {
+            const response = await fetch('https://forno.celo.org', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: "2.0",
+                    method: "eth_call",
+                    params: [{
+                        to: CUSD_ADDRESS,
+                        data: data
+                    }, "latest"],
+                    id: 1
+                })
+            });
+            const result = await response.json();
+            balanceHex = result.result;
+        }
+
+        if (!balanceHex || balanceHex === '0x') return '0.00';
 
         // Convert hex to decimal (18 decimals for cUSD)
         const balanceWei = BigInt(balanceHex);
