@@ -116,13 +116,39 @@ export const getMiniPayBalance = async (address) => {
         }
     };
 
-    // 1. Check Celo Mainnet
+    // Helper for Native Balance (eth_getBalance)
+    const fetchNativeBalance = async (rpcUrl) => {
+        try {
+            const response = await fetch(rpcUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: "2.0",
+                    method: "eth_getBalance",
+                    params: [address, "latest"],
+                    id: 1
+                })
+            });
+            const result = await response.json();
+            if (result.error) return 0;
+            return Number(BigInt(result.result)) / 1e18;
+        } catch (e) {
+            return 0;
+        }
+    };
+
+    // 1. Check Celo Mainnet cUSD
     const mainnetBal = await fetchBalance('https://forno.celo.org', "0x765DE816845861e75A25fCA122bb6898B8B1282a");
     if (mainnetBal > 0) return mainnetBal.toFixed(2);
 
-    // 2. Check Alfajores Testnet
+    // 2. Check Alfajores Testnet cUSD
     const testnetBal = await fetchBalance('https://alfajores-forno.celo-testnet.org', "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1");
     if (testnetBal > 0) return testnetBal.toFixed(2);
+
+    // 3. Check Native CELO Balance (Mainnet) - maybe they have CELO?
+    // Note: This is desperate measure to confirm connectivity
+    const nativeBal = await fetchNativeBalance('https://forno.celo.org');
+    if (nativeBal > 0) return nativeBal.toFixed(2);
 
     return '0.00';
 };

@@ -17,12 +17,6 @@ const Dashboard = () => {
     const loadData = async () => {
       try {
         await refreshUser();
-        // Fetch MiniPay balance if user has a wallet address
-        if (user?.wallet_address || user?.username?.startsWith('0x')) {
-            const address = user?.wallet_address || user?.username;
-            const bal = await getMiniPayBalance(address);
-            setMiniPayBalance(bal);
-        }
       } catch (error) {
         console.error('Failed to load user data:', error);
       } finally {
@@ -31,6 +25,18 @@ const Dashboard = () => {
     };
     loadData();
   }, []);
+
+  // Separate effect for balance to not block UI
+  useEffect(() => {
+    if (!loading && (user?.wallet_address || user?.username?.startsWith('0x'))) {
+        const fetchBalance = async () => {
+            const address = user?.wallet_address || user?.username;
+            const bal = await getMiniPayBalance(address);
+            setMiniPayBalance(bal);
+        };
+        fetchBalance();
+    }
+  }, [loading, user]);
 
   if (loading) {
     return (
