@@ -3,11 +3,11 @@
   "rewrites": [
     {
       "source": "/api/v1/:path*/",
-      "destination": "https://bb1e1e3705cd.ngrok-free.app/api/v1/:path*/"
+      "destination": "https://c5beb0939a17.ngrok-free.app/api/v1/:path*/"
     },
     {
       "source": "/api/v1/:path*",
-      "destination": "https://bb1e1e3705cd.ngrok-free.app/api/v1/:path*"
+      "destination": "https://c5beb0939a17.ngrok-free.app/api/v1/:path*"
     },
     {
       "source": "/(.*)",
