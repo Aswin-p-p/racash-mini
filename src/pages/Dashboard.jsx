@@ -11,7 +11,8 @@ import './Dashboard.css';
 const Dashboard = () => {
   const { user, refreshUser } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [miniPayBalance, setMiniPayBalance] = useState(null);
+  const [miniPayBalance, setMiniPayBalance] = useState('0.00'); // Default to 0.00 so card shows
+  const [isBalanceLoading, setIsBalanceLoading] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -26,17 +27,24 @@ const Dashboard = () => {
     loadData();
   }, []);
 
-  // Separate effect for balance to not block UI
+  // Use separate effect to fetch balance
   useEffect(() => {
-    if (!loading && (user?.wallet_address || user?.username?.startsWith('0x'))) {
+    if (user?.wallet_address || user?.username?.startsWith('0x')) {
         const fetchBalance = async () => {
+            setIsBalanceLoading(true);
             const address = user?.wallet_address || user?.username;
-            const bal = await getMiniPayBalance(address);
-            setMiniPayBalance(bal);
+            try {
+                const bal = await getMiniPayBalance(address);
+                setMiniPayBalance(bal);
+            } catch (e) {
+                console.error("Balance fetch failed", e);
+            } finally {
+                setIsBalanceLoading(false);
+            }
         };
         fetchBalance();
     }
-  }, [loading, user]);
+  }, [user]);
 
   if (loading) {
     return (
@@ -107,23 +115,21 @@ const Dashboard = () => {
         <div className="wallets-section">
           <h2>Your Wallets</h2>
           <div className="wallets-grid fade-in">
-            {/* MiniPay Wallet Card */}
-            {miniPayBalance && (
-                <div className="wallet-card minipay-card">
-                  <div className="wallet-header">
-                    <div className="wallet-icon">
-                      <Wallet size={24} />
-                    </div>
-                    <span className="wallet-currency">MiniPay (cUSD)</span>
-                  </div>
-                  <div className="wallet-balance">
-                    {formatCurrency(miniPayBalance, 'USD')}
-                  </div>
-                  <div className="wallet-footer">
-                    <span className="text-muted">In Your Pocket</span>
-                  </div>
+            {/* MiniPay Wallet Card - Always Show */}
+            <div className="wallet-card minipay-card">
+                <div className="wallet-header">
+                <div className="wallet-icon">
+                    <Wallet size={24} />
                 </div>
-            )}
+                <span className="wallet-currency">MiniPay (cUSD)</span>
+                </div>
+                <div className="wallet-balance">
+                {isBalanceLoading ? "..." : formatCurrency(miniPayBalance, 'USD')}
+                </div>
+                <div className="wallet-footer">
+                <span className="text-muted">In Your Pocket</span>
+                </div>
+            </div>
 
             {wallets.length > 0 ? (
               wallets.map((wallet) => (
